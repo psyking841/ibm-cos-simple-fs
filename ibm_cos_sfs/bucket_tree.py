@@ -1,5 +1,5 @@
 import re
-from ibm_cos_bucket.tree_node import COSBucketTreeNode
+from ibm_cos_sfs.bucket_tree_node import COSBucketTreeNode
 
 class COSBucketTree:
     """
