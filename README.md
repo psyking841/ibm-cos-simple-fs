@@ -3,8 +3,8 @@
 ## Problems with ibm_boto3 library
 The IBMCloud Cloud Object Service has very awful representation of objects under a bucket.
 
-For example, if you are using ibm_boto3, and when you list all objects under a bucket, internally it will be presented as 
-data structure of Python list such as:
+For example, if you are using ibm_boto3, you can only list all objects under a bucket so that you will probably end up 
+with a Python List of objects in that bucket, such as:
 
 ```python
 [
@@ -25,11 +25,11 @@ data structure of Python list such as:
 ]
 ```
 
-This is really awful when you are trying to get the "real objects" (i.e. those test.txt files).
+This is really awful when you are trying to get the "real objects" (i.e. those test.txt files in above example).
 
 ## What this library does?
-This library converts the flat representation of objects in a bucket into a tree-like data structure. As such, the bucket 
-can be represented as a file system, with the concepts of folders/directories and files. This library is able to simulate simple file
+This library adds a presentation layer above boto3, which expresses the flat representation of objects in a bucket (i.e. Python list) as a tree-like data structure. As such, the bucket 
+can be represented as a file system, with the concepts of folders/directories and files. Currently, this library is able to simulate file
 system commands such as "cd" and "ls". See the Usages in next section.
 
 For the above bucket objects, this library will represent it as
