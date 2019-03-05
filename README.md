@@ -54,12 +54,18 @@ test-bucket/
             └─ test.txt
 ```
 
+## Installation
+Project page at Pypi: https://pypi.org/project/ibm-cos-simple-fs/
+```
+pip install ibm-cos-simple-fs
+```
+
 ## Usage
 **Note, paths output from this library is ALWAYS appended by bucket name thus in the form of 'bucket_name/path/to/your/stuff.txt'.
 When using paths with boto3 library, please post-process them to ignore the "bucket_name/" part.**
 **However, ```get_node_from()``` from tree object is designed to convert boto3 path representation to internal tree representation, so it will take boto3 path.**
 ```
-> from cos_bucket_tree_node import COSBucketTree
+> from ibm_cos_bucket.tree import COSBucketTree
 
 # Given flat_object_list being the one in Problem Statement, building a tree structure using
 > tree = COSBucketTree(bucket_name='test-bucket', object_list=flat_object_list)
