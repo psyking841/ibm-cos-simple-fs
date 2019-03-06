@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='ibm-cos-simple-fs',
-    version='0.0.4',
+    version='0.0.5',
     author='Shengyi Pan',
     author_email='shengyi.pan1@gmail.com',
     description='A package for representing IBM Cloud Object Storage (COS) bucket like a file system.',

@@ -102,12 +102,56 @@ class COSBucketTree:
         """
         return self._search_leaves(self.root)
 
-    def get_leaves_paths(self):
+    def get_leaf_paths(self):
         """
         Return all leaves of this tree in the form of paths
         :return:
         """
         return [c.get_path() for c in self._get_leaves()]
+
+    def get_common_parent_for_leaves(self, leaves):
+        """
+        Given a list of leaf paths, return their common parent node
+        :param: a list of COSTreeNode
+        :return: TreeNode
+        """
+        if not leaves:
+            return None
+
+        def get_common(node, leaf1, leaf2):
+            if leaf1.get_path() == leaf2.get_path():
+                return leaf1
+
+            if leaf1.get_path() == node.get_path():
+                return leaf1
+
+            if leaf2.get_path() == node.get_path():
+                return leaf2
+
+            if not node.get_children():
+                return None
+
+            x = []
+            for k, c in node.get_children().items():
+                x.append(get_common(c, leaf1, leaf2))
+
+            #Check if this node is a common parent
+            y = [i for i in x if i]
+            if len(y) == 1:
+                return y[0]
+            elif len(y) == 2:
+                return node
+            else:
+                return None
+
+
+        res = leaves[0]
+        if len(leaves) == 1:
+            return res
+
+        for i in range(len(leaves) - 1):
+            res = get_common(self.root, res, leaves[i + 1])
+        return res
 
     def __str__(self):
         """
@@ -132,10 +176,10 @@ class COSBucketTree:
     def print(self):
         print(self.__str__())
 
-    def get_node_from(self, bucket_path):
+    def get_node_from(self, path):
         """
-        Search the tree for the node for a given bucket_path
-        :param bucket_path: A path to a directory or file that EXCLUDES the bucket name, for example 'source/year=2018/'
+        Search the tree for the node for a given path
+        :param path: A path to a directory or file that EXCLUDES the bucket name, for example 'source/year=2018/'
         :return: The COSBucketTreeNode object the represents this dir or file
         """
         def search_node(l, p_node):
@@ -147,5 +191,5 @@ class COSBucketTree:
                 curr_node = p_node.get_children().get(first)
                 return search_node(rest, curr_node) or curr_node
             return None
-        element_list = re.findall(r'.*?\/|.*?\..+', bucket_path)
+        element_list = re.findall(r'.*?\/|.*?\..+', path)
         return search_node(element_list, self.root)

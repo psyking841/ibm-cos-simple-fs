@@ -21,7 +21,7 @@ flat_object_list = [
 
 def test_tree():
     tree = COSBucketTree(bucket_name='test-bucket', object_list=flat_object_list)
-    r = tree.get_leaves_paths()
+    r = tree.get_leaf_paths()
     assert(r == ['test-bucket/source/year=2018/month=08/day=28/test1.txt',
                  'test-bucket/source/year=2018/month=08/day=28/test.txt',
                  'test-bucket/source/year=2018/month=08/day=29/test.txt',
@@ -58,15 +58,19 @@ test-bucket/
     # Test change directory
     node = tree.get_node_from('source/year=2018/month=08/')
 
-    # Test list directory
+    # Test list the contents under directory; use get_children() to return all children nodes
     contents = node.list_children()
     assert(contents == ['day=28/', 'day=29/', 'day=30/', 'day=31/'])
 
-    leaves_nodes = tree._search_leaves(node)
-    assert([str(l) for l in leaves_nodes] == ['test-bucket/source/year=2018/month=08/day=28/test1.txt',
+    # Test searching all leaf nodes under this directory
+    leaf_nodes = tree._search_leaves(node)
+    assert([l.path for l in leaf_nodes] == ['test-bucket/source/year=2018/month=08/day=28/test1.txt',
                                               'test-bucket/source/year=2018/month=08/day=28/test.txt',
                                               'test-bucket/source/year=2018/month=08/day=29/test.txt',
                                               'test-bucket/source/year=2018/month=08/day=30/test.txt',
                                               'test-bucket/source/year=2018/month=08/day=31/test.txt'])
+    # Test common parent
+    common = tree.get_common_parent_for_leaves(leaf_nodes)
+    assert(common.path == 'test-bucket/source/year=2018/month=08/')
 
 test_tree()

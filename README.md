@@ -54,8 +54,13 @@ test-bucket/
             └─ test.txt
 ```
 
+## Concepts
+* Boto3 object: in boto3, an object is represented is as "test-bucket/source/".
+* Path: a path in this simple FS starts with bucket name, for example a path "test-bucket/source/" represents boto3 object "source/".
+* Leaves: a leaf is a COSBucketTreeNode object whose boto3 object representation is NOT a common prefix for any other boto3 objects. For example, "source/year=2018/month=08/day=28/test1.txt" in above example is a leaf's boto3 object representation.
+
 ## Installation
-Project page at Pypi: https://pypi.org/project/ibm-cos-simple-fs/
+Project is available at Pypi: https://pypi.org/project/ibm-cos-simple-fs/
 ```
 pip install ibm-cos-simple-fs
 ```
@@ -71,7 +76,7 @@ When using paths with boto3 library, please post-process them to ignore the "buc
 > tree = COSBucketTree(bucket_name='test-bucket', object_list=flat_object_list)
 
 # Get all leaves as path string
-> leaves_paths = tree.get_leaves_paths()
+> leaf_paths = tree.get_leaf_paths()
 
 # Print the flat objects representation to be a tree
 > tree.print() 
@@ -87,6 +92,9 @@ When using paths with boto3 library, please post-process them to ignore the "buc
 > leaves_nodes = tree._search_leaves(node) 
 # These are a list of tree nodes, you can then convert them to str representation by
 > [str(l) for l in leaves_nodes]
+
+# To get the directory that contains all given leaves
+> common_parent_node = tree.get_common_parent_for_leaves(leaves_nodes)
 ```
 
 ## Creator
