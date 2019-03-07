@@ -139,6 +139,14 @@ class COSBucketTree:
         """
         return [c.get_path() for c in self._get_leaves()]
 
+    def get_leaf_keys(self):
+        """
+        This method is to output key names that is compatible to boto3.
+        For example, the key for a leaf path 'mybucket/source/a.txt' is 'source/a.txt'
+        :return:
+        """
+        return []
+
     def get_common_parent_for_leaves(self, leaves):
         """
         Given a list of leaf paths, return their common parent node

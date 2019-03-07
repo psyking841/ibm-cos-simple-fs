@@ -69,6 +69,13 @@ test-bucket/
                                               'test-bucket/source/year=2018/month=08/day=29/test.txt',
                                               'test-bucket/source/year=2018/month=08/day=30/test.txt',
                                               'test-bucket/source/year=2018/month=08/day=31/test.txt'])
+
+    # Return leaves as boto3 keys
+    assert([l.key for l in leaf_nodes] == ['source/year=2018/month=08/day=28/test1.txt',
+                                           'source/year=2018/month=08/day=28/test.txt',
+                                           'source/year=2018/month=08/day=29/test.txt',
+                                           'source/year=2018/month=08/day=30/test.txt',
+                                           'source/year=2018/month=08/day=31/test.txt'])
     # Test common parent
     common = tree.get_common_parent_for_leaves(leaf_nodes)
     assert(common.path == 'test-bucket/source/year=2018/month=08/')
