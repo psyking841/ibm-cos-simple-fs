@@ -1,11 +1,12 @@
+import os
 import re
-from ibm_cos_sfs.bucket_tree_node import COSBucketTreeNode
+from ibm_cos_fs.bucket_tree_node import COSBucketTreeNode
 
 class COSBucketTree:
     """
     This class is to convert the flat representation of IBMCloud COS bucket to a tree representation.
 
-    For example, given a list (flat) representation of all objects under a bucket "mybucket":
+    For example, given a list (flat) representation of all objects (in string) under a bucket "mybucket":
     [
         'source/',
         'source/year=2018/',
@@ -22,6 +23,9 @@ class COSBucketTree:
         'source/year=2019/month=01/day=01/',
         'source/year=2019/month=01/day=01/test.txt'
      ]
+
+    Such a list can typically be obtained from
+    >>> [o.key for o in cos_resources.objects.all()]
 
     This class converts it to a tree structure like:
 
@@ -47,8 +51,34 @@ class COSBucketTree:
     """
 
     def __init__(self, bucket_name, object_list):
-        self.bucket_name = bucket_name
+        """
+        :param bucket_name: String, name of the bucket
+        :param object_list: List of Strings, keys in the form of String in the bucket
+        """
+        self.bucket_name = self.__validate_bucket_name(bucket_name)
+        self.object_list = self.__validate_object_list(object_list)
         self.root = self._populate_tree(bucket_name, object_list)
+
+    def __validate_bucket_name(self, bucket_name):
+        """
+        Validate bucket name
+        :param bucket_name:
+        :return:
+        """
+        if not isinstance(bucket_name, str):
+            raise ValueError('Bucket name should be of type String.')
+        return bucket_name
+
+    def __validate_object_list(self, object_list):
+        """
+        Validate the object_list is a list of strings.
+        :param object_list:
+        :return:
+        """
+        res = [o for o in object_list if isinstance(o, str)]
+        if len(res) != len(object_list):
+            raise ValueError('Object list should be a list of strings. \
+            You probably have ObjectSummary object(s) in the list.')
 
     def _populate_tree(self, bucket_name, object_list):
         """
@@ -75,7 +105,7 @@ class COSBucketTree:
 
             return add_node(rest, node.get_children().get(first))
 
-        root = COSBucketTreeNode(bucket_name, None)
+        root = COSBucketTreeNode(os.path.join(bucket_name, ''), None)
         for obj_str in object_list:
             element_list = re.findall(r'.*?\/|.*?\..+', obj_str)
             add_node(element_list, root)

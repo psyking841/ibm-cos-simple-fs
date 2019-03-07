@@ -1,4 +1,4 @@
-from ibm_cos_sfs.bucket_tree import COSBucketTree
+from ibm_cos_fs.bucket_tree import COSBucketTree
 
 flat_object_list = [
     "source/",
