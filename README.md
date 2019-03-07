@@ -89,7 +89,7 @@ When using paths with boto3 library, please post-process them to ignore the "buc
 
 # To get all the leaves under a given path, say 'source/year=2018/month=8/day=29/'
 > node = tree.get_node_from('source/year=2018/month=8/day=29/') 
-> leaf_nodes = tree._search_leaves(node) 
+> leaf_nodes = tree.search_leaves(node) # or all_leaves = tree.search_leaves() will return all leaves from root
 # These are a list of tree nodes, you can then convert them to str representation by
 > [str(l) for l in leaf_nodes] # or [l.path for l in leaf_nodes]
 # In addition, you can get leaves as boto3 keys

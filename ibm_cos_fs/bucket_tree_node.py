@@ -40,7 +40,7 @@ class COSBucketTreeNode:
         if not self.parent:
             return None
         elif not self.parent.key:
-            return os.path.join(self.name, '')
+            return self.name
         return os.path.join(self.parent.key, self.name)
 
     def _generate_path(self):

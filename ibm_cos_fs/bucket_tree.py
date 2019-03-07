@@ -2,6 +2,7 @@ import os
 import re
 from ibm_cos_fs.bucket_tree_node import COSBucketTreeNode
 
+
 class COSBucketTree:
     """
     This class is to convert the flat representation of IBMCloud COS bucket to a tree representation.
@@ -112,40 +113,37 @@ class COSBucketTree:
 
         return root
 
-    def _search_leaves(self, node):
+    def search_leaves(self, *args):
         """
         Search all leaves from a node
-        :param node:
+        :param args: The length of args should be exactly one that represents a BucketTreenode from which the leaves will be searched. If left empty, will search from root.
         :return:
         """
+        if len(args) == 0:
+            node = self.root
+        else:
+            node = args[0]
         if not node.get_children():
             return [node]
         res = []
         for k,c in node.get_children().items():
-            res += self._search_leaves(c)
+            res += self.search_leaves(c)
         return res
-
-    def _get_leaves(self):
-        """
-        List all leaf nodes.
-        :return: a list of full paths to all the leaves
-        """
-        return self._search_leaves(self.root)
 
     def get_leaf_paths(self):
         """
         Return all leaves of this tree in the form of paths
         :return:
         """
-        return [c.get_path() for c in self._get_leaves()]
+        return [c.path for c in self.search_leaves()]
 
     def get_leaf_keys(self):
         """
         This method is to output key names that is compatible to boto3.
-        For example, the key for a leaf path 'mybucket/source/a.txt' is 'source/a.txt'
+        For example, the key for a leaf path 'mybucket/source/' is 'source/' or the key for a leaf path mybucket/a.txt is a.txt
         :return:
         """
-        return []
+        return [c.key for c in self.search_leaves()]
 
     def get_common_parent_for_leaves(self, leaves):
         """
