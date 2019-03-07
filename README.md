@@ -55,7 +55,7 @@ test-bucket/
 ```
 
 ## Concepts
-* Boto3 object: in boto3, an object is represented is as "test-bucket/source/".
+* Boto3 object and Key: in boto3, an object's key is represented as string like "test-bucket/source/".
 * Path: a path in this simple FS starts with bucket name, for example a path "test-bucket/source/" represents boto3 object "source/".
 * Leaves: a leaf is a COSBucketTreeNode object whose boto3 object representation is NOT a common prefix for any other boto3 objects. For example, "source/year=2018/month=08/day=28/test1.txt" in above example is a leaf's boto3 object representation.
 
@@ -89,12 +89,14 @@ When using paths with boto3 library, please post-process them to ignore the "buc
 
 # To get all the leaves under a given path, say 'source/year=2018/month=8/day=29/'
 > node = tree.get_node_from('source/year=2018/month=8/day=29/') 
-> leaves_nodes = tree._search_leaves(node) 
+> leaf_nodes = tree.search_leaves(node) # or all_leaves = tree.search_leaves() will return all leaves from root
 # These are a list of tree nodes, you can then convert them to str representation by
-> [str(l) for l in leaves_nodes]
+> [str(l) for l in leaf_nodes] # or [l.path for l in leaf_nodes]
+# In addition, you can get leaves as boto3 keys
+> [l.key for l in leaf_nodes]
 
 # To get the directory that contains all given leaves
-> common_parent_node = tree.get_common_parent_for_leaves(leaves_nodes)
+> common_parent_node = tree.get_common_parent_for_leaves(leaf_nodes)
 ```
 
 ## Creator

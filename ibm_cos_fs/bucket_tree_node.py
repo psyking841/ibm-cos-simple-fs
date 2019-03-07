@@ -15,6 +15,7 @@ class COSBucketTreeNode:
         self.parent = parent
         self.children = children or {}
         self.path = self._generate_path()
+        self.key = self._generate_key()
 
     def get_name(self):
         return self.name
@@ -27,6 +28,20 @@ class COSBucketTreeNode:
 
     def get_path(self):
         return self.path
+
+    def get_key(self):
+        return self.key
+
+    def _generate_key(self):
+        """
+        Generate the boto3 compatible key name.
+        :return:
+        """
+        if not self.parent:
+            return None
+        elif not self.parent.key:
+            return self.name
+        return os.path.join(self.parent.key, self.name)
 
     def _generate_path(self):
         """
