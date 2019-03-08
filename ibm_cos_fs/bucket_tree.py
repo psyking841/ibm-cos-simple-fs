@@ -58,7 +58,7 @@ class COSBucketTree:
         """
         self.bucket_name = self.__validate_bucket_name(bucket_name)
         self.object_list = self.__validate_object_list(object_list)
-        self.root = self._populate_tree(bucket_name, object_list)
+        self.root = self.__populate_tree(bucket_name, object_list)
 
     def __validate_bucket_name(self, bucket_name):
         """
@@ -81,7 +81,7 @@ class COSBucketTree:
             raise ValueError('Object list should be a list of strings. \
             You probably have ObjectSummary object(s) in the list.')
 
-    def _populate_tree(self, bucket_name, object_list):
+    def __populate_tree(self, bucket_name, object_list):
         """
         Populate the whole tree given the flat representation (i.e. list).
         :param bucket_name: String. Name of the bucket
@@ -180,7 +180,6 @@ class COSBucketTree:
             else:
                 return None
 
-
         res = leaves[0]
         if len(leaves) == 1:
             return res
@@ -212,20 +211,36 @@ class COSBucketTree:
     def print(self):
         print(self.__str__())
 
-    def get_node_from(self, path):
+    def __search_node(self, element_list, parent_node):
         """
-        Search the tree for the node for a given path
-        :param path: A path to a directory or file that EXCLUDES the bucket name, for example 'source/year=2018/'
+
+        :param element_list: Such as ['source/', 'year=2018/']
+        :param parent_node: The parent node of the node represented by the element_list
+        :return:
+        """
+        if not element_list:
+            return None
+        first = element_list[0]
+        rest = element_list[1:]
+        if first in parent_node.list_children():
+            curr_node = parent_node.get_children().get(first)
+            return self.__search_node(rest, curr_node) or curr_node
+        return None
+
+    def get_node_from_key(self, key):
+        """
+        Search the tree for the node for a given boto3 object key
+        :param key: Name of the  'source/year=2018/'
         :return: The COSBucketTreeNode object the represents this dir or file
         """
-        def search_node(l, p_node):
-            if not l:
-                return None
-            first = l[0]
-            rest = l[1:]
-            if first in p_node.list_children():
-                curr_node = p_node.get_children().get(first)
-                return search_node(rest, curr_node) or curr_node
-            return None
-        element_list = re.findall(r'.*?\/|.*?\..+', path)
-        return search_node(element_list, self.root)
+        element_list = re.findall(r'.*?\/|.*?\..+', key)
+        return self.__search_node(element_list, self.root)
+
+    def get_node_from_path(self, path):
+        """
+        Search the tree for the node for a given path
+        :param key: Name of the  'mybucket/source/year=2018/'
+        :return: The COSBucketTreeNode object the represents this dir or file
+        """
+        element_list = re.findall(r'.*?\/|.*?\..+', path)[1:]
+        return self.__search_node(element_list, self.root)

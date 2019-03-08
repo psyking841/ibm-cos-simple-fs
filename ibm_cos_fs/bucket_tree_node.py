@@ -34,7 +34,7 @@ class COSBucketTreeNode:
 
     def _generate_key(self):
         """
-        Generate the boto3 compatible key name.
+        Generate the boto3 key name.
         :return:
         """
         if not self.parent:
@@ -56,7 +56,7 @@ class COSBucketTreeNode:
     def list_children(self):
         """
 
-        :return: All children as string under this node
+        :return: All children as object keys under this node
         """
         return list(self.children.keys())
 

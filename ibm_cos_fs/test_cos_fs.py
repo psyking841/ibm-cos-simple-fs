@@ -55,8 +55,12 @@ test-bucket/
 ''')
     print(t)
 
+    node0 = tree.get_node_from_path('mybucket/source/year=2018/month=08/')
+    contents0 = node0.list_children()
+    assert(contents0 == ['day=28/', 'day=29/', 'day=30/', 'day=31/'])
+
     # Test change directory
-    node = tree.get_node_from('source/year=2018/month=08/')
+    node = tree.get_node_from_key('source/year=2018/month=08/')
 
     # Test list the contents under directory; use get_children() to return all children nodes
     contents = node.list_children()
