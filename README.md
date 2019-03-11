@@ -82,7 +82,7 @@ When using key names with boto3 library, you should post-process the path to ign
 
 # To get all the children nodes of a given boto3 object key, say 'source/year=2018/month=8/'
 > node = tree.get_node_from_key('source/year=2018/month=8/') # This is to simulate 'cd source/year=2018/month=8/' in a file system.
-> node.get_children() # To get the children_node map
+> node.children # To get the children_node as a {name: TreeNode} map
 # Or
 > node.list_children() # To get a list of children as string. This is to simulate 'ls source/year=2018/month=8/' in a file system.
 

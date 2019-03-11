@@ -1,4 +1,5 @@
 import os
+import re
 
 class COSBucketTreeNode:
     """
@@ -8,29 +9,42 @@ class COSBucketTreeNode:
         """
 
         :param name: could be a directory name like 'source/' or a file name 'test.txt'
-        :param parent:
+        :param parent: parent node of current node
         :param children: a dict of format {child_name: COSBucketTreeNode object} that represents the children of current node
+        :param path: internal representation of object, which includes the bucket name
+        :param key: boto3 representation of object, which excludes the bucket name
+        :param is_dir: whether or not this node represents a directory
         """
-        self.name = name
-        self.parent = parent
-        self.children = children or {}
-        self.path = self._generate_path()
-        self.key = self._generate_key()
+        self._name = name
+        self._parent = parent
+        self._children = children or {}
+        self._path = self._generate_path()
+        self._key = self._generate_key()
+        self._is_dir = False
 
-    def get_name(self):
-        return self.name
+    @property
+    def name(self):
+        return self._name
 
-    def get_parent(self):
-        return self.parent
+    @property
+    def parent(self):
+        return self._parent
 
-    def get_children(self):
-        return self.children
+    @property
+    def children(self):
+        return self._children
 
-    def get_path(self):
-        return self.path
+    @property
+    def path(self):
+        return self._path
 
-    def get_key(self):
-        return self.key
+    @property
+    def key(self):
+        return self._key
+
+    @property
+    def is_dir(self):
+        return True if re.match(r'.+(?=\/)', self.name) else False
 
     def _generate_key(self):
         """
