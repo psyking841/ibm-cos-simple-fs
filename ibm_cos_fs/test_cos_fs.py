@@ -56,14 +56,14 @@ test-bucket/
     print(t)
 
     node0 = tree.get_node_from_path('mybucket/source/year=2018/month=08/')
-    contents0 = node0.list_children()
+    contents0 = node0.ls()
     assert(contents0 == ['day=28/', 'day=29/', 'day=30/', 'day=31/'])
 
     # Test change directory
     node = tree.get_node_from_key('source/year=2018/month=08/')
 
     # Test list the contents under directory; use children property to return all children nodes
-    contents = node.list_children()
+    contents = node.ls()
     assert(contents == ['day=28/', 'day=29/', 'day=30/', 'day=31/'])
 
     assert([l.path for l in tree.get_leaves(node)] == ['test-bucket/source/year=2018/month=08/day=28/test1.txt',
@@ -104,6 +104,9 @@ def test_tree1():
                                                 'test-bucket/test2.txt'])
     assert([l.key for l in all_leaf_nodes] == ['source/', 'test1.txt', 'test2.txt'])
     assert([l.is_dir for l in all_leaf_nodes] == [True, False, False])
+
+    root = tree.root
+    assert([c.key for c in root.children if not c.is_dir] == ['test1.txt', 'test2.txt'])
 
 
 test_tree()

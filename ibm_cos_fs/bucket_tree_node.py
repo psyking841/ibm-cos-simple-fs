@@ -5,11 +5,12 @@ class COSBucketTreeNode:
     """
     This class is to represent a folder/file as a node in the COS Tree.
     """
-    def __init__(self, name, parent, children=None):
+    def __init__(self, name, parent, children_map=None):
         """
 
         :param name: could be a directory name like 'source/' or a file name 'test.txt'
         :param parent: parent node of current node
+        :param children_map: a dict of format {child_name: COSBucketTreeNode object} that represents the children of current node
         :param children: a dict of format {child_name: COSBucketTreeNode object} that represents the children of current node
         :param path: internal representation of object, which includes the bucket name
         :param key: boto3 representation of object, which excludes the bucket name
@@ -17,7 +18,7 @@ class COSBucketTreeNode:
         """
         self._name = name
         self._parent = parent
-        self._children = children or {}
+        self._children_map = children_map or {}
         self._path = self._generate_path()
         self._key = self._generate_key()
         self._is_dir = False
@@ -31,8 +32,12 @@ class COSBucketTreeNode:
         return self._parent
 
     @property
+    def children_map(self):
+        return self._children_map
+
+    @property
     def children(self):
-        return self._children
+        return None if not self._children_map else self._children_map.values()
 
     @property
     def path(self):
@@ -67,12 +72,12 @@ class COSBucketTreeNode:
             return self.name
         return os.path.join(self.parent.path, self.name)
 
-    def list_children(self):
+    def ls(self):
         """
 
         :return: All children as object keys under this node
         """
-        return list(self.children.keys())
+        return list(self.children_map.keys())
 
     def __str__(self):
         return self.path

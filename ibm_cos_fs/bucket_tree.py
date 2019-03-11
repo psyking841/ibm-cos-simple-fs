@@ -101,10 +101,10 @@ class COSBucketTree:
 
             first = elem_list[0]
             rest = elem_list[1:]
-            if first not in node.children.keys():
-                node.children.update({first: COSBucketTreeNode(first, node)})
+            if first not in node.children_map.keys():
+                node.children_map.update({first: COSBucketTreeNode(first, node)})
 
-            return add_node(rest, node.children.get(first))
+            return add_node(rest, node.children_map.get(first))
 
         root = COSBucketTreeNode(os.path.join(bucket_name, ''), None)
         for obj_str in object_list:
@@ -119,10 +119,10 @@ class COSBucketTree:
         :param args: The length of args should be exactly one that represents a BucketTreenode from which the leaves will be searched. If left empty, will search from root.
         :return:
         """
-        if not node.children:
+        if not node.children_map:
             return [node]
         res = []
-        for k,c in node.children.items():
+        for k,c in node.children_map.items():
             res += self.__search_leaves(c)
         return res
 
@@ -169,11 +169,11 @@ class COSBucketTree:
             if leaf2.path == node.path:
                 return leaf2
 
-            if not node.children:
+            if not node.children_map:
                 return None
 
             x = []
-            for k, c in node.children.items():
+            for k, c in node.children_map.items():
                 x.append(get_common(c, leaf1, leaf2))
 
             #Check if this node is a common parent
@@ -201,15 +201,15 @@ class COSBucketTree:
         """
         def print_tree(node, level):
             indent = ' ' * (level - 1) * 3
-            if not node.children:
+            if not node.children_map:
                 return indent + '└─ {} \n'.format(node.name)
             res = indent + '└─ {} \n'.format(node.name)
-            for k,c in node.children.items():
+            for k,c in node.children_map.items():
                 res += print_tree(c, level + 1)
             return res
 
         printed_tree = self.bucket_name + '/ \n'
-        for k, c in self.root.children.items():
+        for k, c in self.root.children_map.items():
             printed_tree += print_tree(c, 1)
         return printed_tree
 
@@ -227,8 +227,8 @@ class COSBucketTree:
             return None
         first = element_list[0]
         rest = element_list[1:]
-        if first in parent_node.list_children():
-            curr_node = parent_node.children.get(first)
+        if first in parent_node.ls():
+            curr_node = parent_node.children_map.get(first)
             return self.__search_node(rest, curr_node) or curr_node
         return None
 
