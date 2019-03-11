@@ -113,37 +113,42 @@ class COSBucketTree:
 
         return root
 
-    def search_leaves(self, *args):
+    def __search_leaves(self, node):
         """
-        Search all leaves from a node
+        Helper method for searching leaves from a node
         :param args: The length of args should be exactly one that represents a BucketTreenode from which the leaves will be searched. If left empty, will search from root.
         :return:
         """
-        if len(args) == 0:
-            node = self.root
-        else:
-            node = args[0]
         if not node.children:
             return [node]
         res = []
         for k,c in node.children.items():
-            res += self.search_leaves(c)
+            res += self.__search_leaves(c)
         return res
 
-    def get_leaf_paths(self):
+    def get_leaves(self, node=None):
+        """
+        Get all leaves from a node
+        :param node:
+        :return:
+        """
+        node = node or self.root
+        return self.__search_leaves(node)
+
+    def get_leaf_paths(self, node=None):
         """
         Return all leaves of this tree in the form of paths
         :return:
         """
-        return [c.path for c in self.search_leaves()]
+        return [c.path for c in self.__search_leaves(self.root if not node else node)]
 
-    def get_leaf_keys(self):
+    def get_leaf_keys(self, node=None):
         """
         This method is to output key names that is compatible to boto3.
         For example, the key for a leaf path 'mybucket/source/' is 'source/' or the key for a leaf path mybucket/a.txt is a.txt
         :return:
         """
-        return [c.key for c in self.search_leaves()]
+        return [c.key for c in self.__search_leaves(self.root if not node else node)]
 
     def get_common_parent_for_leaves(self, leaves):
         """

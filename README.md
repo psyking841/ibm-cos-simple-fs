@@ -74,7 +74,7 @@ When using key names with boto3 library, you should post-process the path to ign
 # Given flat_object_list being the one in Problem statement, building a tree structure using:
 > tree = COSBucketTree(bucket_name='test-bucket', object_list=flat_object_list) # flat_object_list should be a list of strings
 
-# Get all leaves as path string
+# Get all leaves as a list of path strings
 > leaf_paths = tree.get_leaf_paths()
 
 # Print the tree representation of the file system structure
@@ -90,9 +90,10 @@ When using key names with boto3 library, you should post-process the path to ign
 # To get all the leaves under a given object key, say 'source/year=2018/month=8/day=29/'
 # Firstly, find the node for this key
 > node = tree.get_node_from_key('source/year=2018/month=8/day=29/') 
+> node.is_dir # will show whether or not current node is a directory
 
-# Then, get the leaves nodes
-> leaf_nodes = tree.search_leaves(node) # or all_leaves = tree.search_leaves() will return all leaves from root
+# Then, get the leaves nodes from a specific node
+> leaf_nodes = tree.get_leaves(node) # Note, all_leaves = tree.get_leaves() will return all leaves from root
 
 # You can then convert them to string representation (i.e. paths) by
 > [str(l) for l in leaf_nodes] # or [l.path for l in leaf_nodes]
@@ -100,7 +101,7 @@ When using key names with boto3 library, you should post-process the path to ign
 # In addition, you can get leaves as boto3 object keys
 > [l.key for l in leaf_nodes]
 
-# To get the directory that contains all given leaves
+# To get the directory that contains all given leaves; this is reverse operation to get_leaves(common_parent_node)
 > common_parent_node = tree.get_common_parent_for_leaves(leaf_nodes)
 ```
 
