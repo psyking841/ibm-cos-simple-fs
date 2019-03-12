@@ -101,10 +101,10 @@ class COSBucketTree:
 
             first = elem_list[0]
             rest = elem_list[1:]
-            if first not in node.get_children().keys():
-                node.get_children().update({first: COSBucketTreeNode(first, node)})
+            if first not in node.children_map.keys():
+                node.children_map.update({first: COSBucketTreeNode(first, node)})
 
-            return add_node(rest, node.get_children().get(first))
+            return add_node(rest, node.children_map.get(first))
 
         root = COSBucketTreeNode(os.path.join(bucket_name, ''), None)
         for obj_str in object_list:
@@ -113,37 +113,42 @@ class COSBucketTree:
 
         return root
 
-    def search_leaves(self, *args):
+    def __search_leaves(self, node):
         """
-        Search all leaves from a node
+        Helper method for searching leaves from a node
         :param args: The length of args should be exactly one that represents a BucketTreenode from which the leaves will be searched. If left empty, will search from root.
         :return:
         """
-        if len(args) == 0:
-            node = self.root
-        else:
-            node = args[0]
-        if not node.get_children():
+        if not node.children_map:
             return [node]
         res = []
-        for k,c in node.get_children().items():
-            res += self.search_leaves(c)
+        for k,c in node.children_map.items():
+            res += self.__search_leaves(c)
         return res
 
-    def get_leaf_paths(self):
+    def get_leaves(self, node=None):
+        """
+        Get all leaves from a node
+        :param node:
+        :return:
+        """
+        node = node or self.root
+        return self.__search_leaves(node)
+
+    def get_leaf_paths(self, node=None):
         """
         Return all leaves of this tree in the form of paths
         :return:
         """
-        return [c.path for c in self.search_leaves()]
+        return [c.path for c in self.__search_leaves(self.root if not node else node)]
 
-    def get_leaf_keys(self):
+    def get_leaf_keys(self, node=None):
         """
         This method is to output key names that is compatible to boto3.
         For example, the key for a leaf path 'mybucket/source/' is 'source/' or the key for a leaf path mybucket/a.txt is a.txt
         :return:
         """
-        return [c.key for c in self.search_leaves()]
+        return [c.key for c in self.__search_leaves(self.root if not node else node)]
 
     def get_common_parent_for_leaves(self, leaves):
         """
@@ -155,20 +160,20 @@ class COSBucketTree:
             return None
 
         def get_common(node, leaf1, leaf2):
-            if leaf1.get_path() == leaf2.get_path():
+            if leaf1.path == leaf2.path:
                 return leaf1
 
-            if leaf1.get_path() == node.get_path():
+            if leaf1.path == node.path:
                 return leaf1
 
-            if leaf2.get_path() == node.get_path():
+            if leaf2.path == node.path:
                 return leaf2
 
-            if not node.get_children():
+            if not node.children_map:
                 return None
 
             x = []
-            for k, c in node.get_children().items():
+            for k, c in node.children_map.items():
                 x.append(get_common(c, leaf1, leaf2))
 
             #Check if this node is a common parent
@@ -196,15 +201,15 @@ class COSBucketTree:
         """
         def print_tree(node, level):
             indent = ' ' * (level - 1) * 3
-            if not node.children:
+            if not node.children_map:
                 return indent + '└─ {} \n'.format(node.name)
             res = indent + '└─ {} \n'.format(node.name)
-            for k,c in node.get_children().items():
+            for k,c in node.children_map.items():
                 res += print_tree(c, level + 1)
             return res
 
         printed_tree = self.bucket_name + '/ \n'
-        for k, c in self.root.get_children().items():
+        for k, c in self.root.children_map.items():
             printed_tree += print_tree(c, 1)
         return printed_tree
 
@@ -222,8 +227,8 @@ class COSBucketTree:
             return None
         first = element_list[0]
         rest = element_list[1:]
-        if first in parent_node.list_children():
-            curr_node = parent_node.get_children().get(first)
+        if first in parent_node.ls():
+            curr_node = parent_node.children_map.get(first)
             return self.__search_node(rest, curr_node) or curr_node
         return None
 
