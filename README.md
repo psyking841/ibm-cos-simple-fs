@@ -69,6 +69,8 @@ pip install ibm-cos-simple-fs
 **Note, paths output from this library is ALWAYS appended by bucket name thus in the form of 'bucket_name/path/to/your/stuff.txt'.
 When using key names with boto3 library, you should post-process the path to ignore the "bucket_name/" part.**
 ```
+> cos_resource = ibm_boto3.resource('s3')
+> flat_object_list = cos_resource.Bucket('some-bucket').objects.all() # This will be used to build the file system tree.
 > from ibm_cos_fs.bucket_tree import COSBucketTree
 
 # Given flat_object_list being the one in Problem statement, building a tree structure using:
